@@ -1,0 +1,77 @@
+FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel
+
+# needed to allow apt update
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A4B469963BF863CC
+
+RUN apt update && apt install -y \
+	git \
+    	ninja-build \
+    	libglib2.0-0 \
+    	libsm6 \
+    	libxrender-dev \
+    	libxext6 \
+    	libgl1-mesa-glx \
+    	vim \
+	curl \
+	libboost-dev \
+	tmux \
+	freeglut3-dev \
+  	unzip \
+	wget \
+	libusb-1.0-0-dev \
+	libssl1.0-dev \
+	llvm-6.0 \
+	libxrender1 \
+	libfontconfig1 \
+	libosmesa6-dev \
+	libturbojpeg
+
+RUN apt --fix-broken install
+
+# install python dependencies
+RUN pip install --ignore-installed \
+	chumpy==0.70 \
+	imageio==2.9.0 \
+	jpeg4py==0.1.4 \
+	joblib==1.0.0 \
+	kornia==0.4.1 \
+	loguru==0.5.3 \
+	matplotlib==3.3.3 \
+	numpy==1.19.5 \
+	omegaconf==2.0.6 \
+	opencv-python==4.5.1.48 \
+	open3d \
+	Pillow \
+	PyOpenGL==3.1.0 \
+	pyrender==0.1.43 \
+	pytorch-lightning==1.8.3.post0 \
+	scikit-image==0.18.1 \
+	scikit-learn==0.24.0 \
+	scipy==1.6.0 \
+	sklearn==0.0 \
+	smplx==0.1.27 \
+	torchgeometry==0.1.2 \
+	torchmetrics==0.7.0 \
+	tqdm==4.57.0 \
+	trimesh==3.9.1 \
+	yacs==0.1.8 \
+	fvcore \
+	nflows==0.14 \
+	PyYAML==5.4 \
+	torchdata==0.3.0
+
+RUN pip install \
+	torch==1.11.0+cu113 \
+	torchvision==0.12.0+cu113 \
+	torchaudio==0.11.0 --extra-index-url https://download.pytorch.org/whl/cu113
+
+RUN wget https://github.com/mmatl/travis_debs/raw/master/xenial/mesa_18.3.3-0.deb \
+	&& dpkg -i ./mesa_18.3.3-0.deb || true \
+	&& apt install -yf
+
+RUN git clone https://github.com/mmatl/pyopengl.git \
+	&& pip install ./pyopengl 
+
+RUN mkdir -p /shapy
+
+WORKDIR /shapy
